@@ -1,0 +1,7 @@
+# dsh-thought-capsule bundle patch: 把插件行插进 profile 的 roster。
+#
+# 宿主半边  : exports "."      -> lib/index.js   （注册 /thought-capsule 路由 + capsule_* 工具 + 系统提示）
+# 浏览器半边: exports "./client" -> lib/client.js （由 package.json 的 dsh.client 声明，served at /plugins/dsh-thought-capsule/client.js）
+- insert:
+    - id: thought-capsule
+      name: 'dsh-thought-capsule'
