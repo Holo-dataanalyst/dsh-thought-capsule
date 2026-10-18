@@ -19,6 +19,42 @@ Agent 也有 `capsule_add / capsule_list / capsule_update` 三个工具（**没�
 
 > 只改源码不够：宿主读的是安装副本。改完跑一次 `node scripts\install.mjs`，再重启 DSH 桌面端。
 
+## 装给别人（GitHub Release）
+
+公开仓库：<https://github.com/Holo-dataanalyst/dsh-thought-capsule>，发版走 tag + Release（不是只推代码）。最新版见 [Releases](https://github.com/Holo-dataanalyst/dsh-thought-capsule/releases)。
+
+```bash
+# 跟随 main
+dsh plugin --profile <档案> add github:Holo-dataanalyst/dsh-thought-capsule
+
+# 钉死某个 Release 的 tag（推荐给别人用）
+dsh plugin --profile <档案> add github:Holo-dataanalyst/dsh-thought-capsule#v0.2.0
+
+# 不装 git 也行：直接装 Release 附件
+dsh plugin --profile <档案> add https://github.com/Holo-dataanalyst/dsh-thought-capsule/releases/download/v0.2.0/dsh-thought-capsule-0.2.0.tgz
+```
+
+装完重启 DSH。要求 DSH `>= 0.1.7-rc.2`（`dsh.engines` 会挡旧版本）、Node `>= 22`。
+
+## 命令行
+
+装好后就有 `dsh-thought-capsule` 命令（`bin` → `lib/cli.js`），跟面板、Agent 工具读写同一份 `capsules.json`：
+
+```bash
+dsh-thought-capsule add "试试 better-sidebar 插件"      # 记一条，自动分类
+dsh-thought-capsule add "周五交汇报" -c work --due 2026-10-23 --tag 汇报
+dsh-thought-capsule list                                # 全部（默认 20 条）
+dsh-thought-capsule list -s todo -n 5                   # 待办 5 条
+dsh-thought-capsule update <id> -s done                 # 挪到已完成
+dsh-thought-capsule categories                          # 分类表
+dsh-thought-capsule path                                # 打印数据目录
+dsh-thought-capsule export > capsules.json              # 导出整份
+```
+
+- 数据目录：`--data <dir>` > `--profile <name>`（`$DSH_HOME/profiles/<name>`）> `$DSH_HOME` > `~/.dsh`。
+- 桌面端档案常在别的根下（如 `E:\AI\DSHTauri\.dsh`），`$DSH_HOME` 不在环境里时用 `--data` 直接指到 `<profile>` 目录；找错目录时命令会把「我找的是哪个文件」打到 stderr，不会静默给空列表。
+- 读命令都支持 `--json`。
+
 ## 快速开始
 
 1. 接线（只需一次）：`node scripts\install.mjs` → 重启 DSH 桌面端。
@@ -93,9 +129,18 @@ prefix `/thought-capsule`：`GET /api/health`、`GET /api/state`、`POST /api/it
 
 ```powershell
 cd C:\Users\kaisa\.dsh\thought-capsule
-node test\smoke.mjs          # 138 checks，必须 exit 0
+npm test                     # smoke 138 checks + cli 18 checks，必须 exit 0
 node scripts\install.mjs     # 同步到 E:\AI\DSHTauri\thought-capsule 并接线 profile（幂等）
 # 重启 DSH 桌面端，再验 health / client-report
+```
+
+发版（git 仓库是 publish 工具用 API 建的，本地没有 `.git`，所以 `gh` 要带 `-R`）：
+
+```powershell
+node $env:PUBLISH_CLI --yes --token (gh auth token) --message "feat: ..."   # 推到 main
+npm pack                                                                    # 产物只含 files 白名单
+gh release create v0.x.0 dsh-thought-capsule-0.x.0.tgz -R Holo-dataanalyst/dsh-thought-capsule `
+  --target <commit> --title "..." --notes-file notes.md
 ```
 
 ## 回滚

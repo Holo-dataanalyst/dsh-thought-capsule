@@ -1,6 +1,6 @@
 {
   "name": "dsh-thought-capsule",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "思维胶囊：干活时想到的点子 / 待试插件，一句话记下来，自动分类进待办。带侧边栏面板、Agent 工具与命令行。",
   "main": "lib/index.js",
