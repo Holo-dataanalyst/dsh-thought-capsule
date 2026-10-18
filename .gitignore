@@ -1,0 +1,10 @@
+# 编辑器 / 系统垃圾
+*.bak*
+*.tmp-*
+.DS_Store
+Thumbs.db
+node_modules/
+.dsh-thought-capsule/
+
+# 打包产物
+*.tgz

@@ -132,7 +132,8 @@ ok(
   resolveBaseDir({ config: {}, ctx: null, env: { DSH_HOME: sandbox } }) === path.resolve(sandbox),
   '$DSH_HOME 兜底',
 );
-ok(/[\\/]\.dsh$/.test(resolveBaseDir({ config: {}, ctx: null, env: {} })), '最后兜底到 ~/.dsh');
+// env.DSH_HOME 显式给空串：不让外部 shell 里残留的 $DSH_HOME 影响这条
+ok(/[\\/]\.dsh$/.test(resolveBaseDir({ config: {}, ctx: null, env: { DSH_HOME: '' } })), '最后兜底到 ~/.dsh');
 
 // ---- 写盘护栏：备份失败时放弃写入 ----
 const guardPaths = storePaths(fs.mkdtempSync(path.join(os.tmpdir(), 'capsule-guard-')));
