@@ -1,8 +1,7 @@
 # 思维胶囊（dsh-thought-capsule）
 
-干活时脑子里冒出来的点子、待试的插件、要回头查的东西，一句话丢进去；左侧栏胶囊图标里整理成**未整理 → 待办 → 已完成 → 归档**，六种固定分类自动归类，也能建自己的分组。
-面板里有搜索、**本周回看**（这周新增/完成/停了 7 天没动的待办）、**导出 JSON**；读长文时划一段话会在选区旁边浮出「记下来」，一键存成「阅读」胶囊。
-Agent 也有 `capsule_add / capsule_list / capsule_update` 三个工具（**没有删除工具**，删条目只能由用户自己在面板确认）。
+是不是脑子里突然冒出来一个想法，想让DSH试一下新功能、修改之前的方案、添加新插件。但是DSH还没完成这项工作。亦或者你的灵感很零散，可能只是一个尚未成型的灵感，甚至只是临时起意的点子。但写在手机和便签里感觉又太麻烦，而且希望自己的点子会和AI有深度交互。那么这个思维胶囊就能容纳你的灵感，干活时脑子里冒出来的点子、待试的插件、要回头查的东西，写完后一句话丢进去；并且导航中的胶囊图标里整理成**未整理 → 待办 → 已完成 → 归档**，六种固定分类自动归类，也能建自己的分组。
+面板里有搜索、**本周回看**（这周新增/完成/停了 7 天没动的待办）、**导出 JSON**；读长文时划一段话会在选区旁边浮出「记下来」，一键存成「阅读」胶囊。这个插件也不是一个便签，而是能和AI深度交互的工具，你可以立刻把自己的想法丢给AI实现。
 
 > 第一次用：直接看 [docs/tutorial.md](docs/tutorial.md)（五分钟上手 + 五个场景 + 常见问题）。
 
@@ -82,25 +81,6 @@ dsh-thought-capsule export > capsules.json              # 导出整份
 - **悬浮胶囊**：面板右上角 ⚙ →「在桌面上显示彩色思维胶囊」。`shell.overlay` 席位上的彩色小球，点一下弹便签，可拖动，位置/大小/透明度/图标存在库里。
 - **设置卡**：`设置 → 插件 → dsh-thought-capsule` 的插件页卡片（官方 keyed 席位 `plugins.bundle.config`），和面板 ⚙ 读写同一份 `/api/settings`。
 - **找我漏掉的待办**：`POST /api/find-missed` 读最近会话（滤掉宿主注入的上下文噪音），用宿主默认模型问一次，面板里直接渲染成表格（事项 / 出自会话 / 判断依据）。全程不新开会话。
-
-## 接口
-
-prefix `/thought-capsule`：`GET /api/health`、`GET /api/state`、`POST /api/items`、`PATCH /api/items/:id`、`DELETE /api/items/:id`、`POST /api/client-report`（自检）、`GET /api/sessions`、`GET /api/workspaces`、`GET /api/scan`、`POST /api/find-missed`、`GET /api/review?days=7`、`GET /api/export`、`GET|PUT /api/settings`、`POST /api/categories`、`GET|PUT /api/draft`。
-
-分类 id：内置 `tools work idea read life other` + 用户自建 `g-xxxxxxxx`；状态：`inbox todo done archived`（`archived` 带 `archivedAt`，仍可 DELETE）。
-胶囊可选字段：`tags`（最多 8 个、自动去 `#`）、`dueDate`（只存 `YYYY-MM-DD`，不做提醒）、`sourceSessionId`、`routedSessionId` + `routedAt`。
-
-## 开发
-
-```bash
-npm test        # smoke + cli，必须 exit 0
-```
-
-- `lib/index.js` 宿主半边：注册路由、工具、系统提示。
-- `lib/client.js` 浏览器半边：面板、悬浮球、划词气泡。
-- `lib/store.js` 存储；`lib/routes.js` HTTP 路由；`lib/classify.js` 关键词分类。
-- 宿主半边**不 import 任何 `@deepseek-ai` 包**：工具描述就是普通数据对象，直接交给 `ctx.tools.register`。
-- 客户端改动后刷新页面即生效（bundle 在页面加载时取）。
 
 ## 许可
 
